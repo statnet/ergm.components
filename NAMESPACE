@@ -1,0 +1,5 @@
+
+useDynLib(ergm.components)
+
+# Export all names
+exportPattern(".")

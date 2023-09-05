@@ -1,0 +1,10 @@
+Package: ergm.components
+Version: 0.4
+Date: 2023-08-29
+Title:  ERGM Terms Based on Connectivity and Components
+Authors@R: person("Carter T.", "Butts", role=c("aut","cre"), email="buttsc@uci.edu")
+LinkingTo: ergm
+Depends: network (>= 1.7-1), ergm (>= 3.0-999), statnet.common, R (>= 3.5.0)
+Description:  Additional terms for the ergm package based on component counts and related connectivity properties.
+License: GPL-3 + file LICENSE
+URL: https://statnet.org
