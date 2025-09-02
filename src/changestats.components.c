@@ -4,7 +4,7 @@
 # changestats.components.c
 #
 # copyright (c) 2022, Carter T. Butts <buttsc@uci.edu>
-# Last Modified 08/02/23
+# Last Modified 09/01/25
 # Licensed under the GNU General Public License v3 or later
 #
 # Portions based on the statnet ergm.userterms package (Hunter et al.,
@@ -165,10 +165,10 @@ double localBridgeCnt(Network *nwp, Vertex tail, Vertex head, int thpresent, int
   Vertex *miniter,*viter,*iter;
 
   /*Initialize*/
-  visited=Calloc(N_NODES,char);
-  miniter=Calloc(N_NODES,Vertex);
-  viter=Calloc(N_NODES,Vertex);
-  iter=Calloc(1,Vertex);
+  visited=R_Calloc(N_NODES,char);
+  miniter=R_Calloc(N_NODES,Vertex);
+  viter=R_Calloc(N_NODES,Vertex);
+  iter=R_Calloc(1,Vertex);
   *iter=1;
 
   /*If this is directed and dyadic, the changescore is always zero if there is an incoming
@@ -185,10 +185,10 @@ double localBridgeCnt(Network *nwp, Vertex tail, Vertex head, int thpresent, int
   }
 
   /*Clean up and return*/
-  Free(visited);
-  Free(miniter);
-  Free(viter);
-  Free(iter);
+  R_Free(visited);
+  R_Free(miniter);
+  R_Free(viter);
+  R_Free(iter);
   return bc;
 }
 
@@ -415,14 +415,14 @@ CHANGESTAT_FN(d_components) {
     tail=TAIL(i);      /*Get endpoints*/
     head=HEAD(i);
     //Rprintf("Working on {%ld,%ld}\n",tail,head);
-    el=Calloc(1,element);
+    el=R_Calloc(1,element);
     el->v=tail;
     el->next=NULL;
     el->prev=NULL;
     tovisit=el;
     nextvis=el;
     flag=(DIRECTED)&&(IS_OUTEDGE(head,tail)); /*Redundant w/in dyad edge shortcut*/
-    visited=Calloc(N_NODES,char);
+    visited=R_Calloc(N_NODES,char);
     visited[tail-1]=1;
     while((!flag)&&(tovisit!=NULL)){
       /*Take the next element*/
@@ -434,13 +434,13 @@ CHANGESTAT_FN(d_components) {
         el->prev->next=NULL;
       v=el->v;
       //Rprintf("\tDeqeued %ld\n",v);
-      Free(el);             /*Recycle this element*/
+      R_Free(el);           /*Recycle this element*/
       /*Process v*/
       STEP_THROUGH_OUTEDGES(v,e,alter){
         if((!DYADMATCH(tail,head,v,alter))&&(!visited[alter-1])&&(!flag)){
           if(alter==head)  /*If we've found our goal, set the flag*/
             flag=1;
-          el=Calloc(1,element);  /*Add to the top of our visitation queue*/
+          el=R_Calloc(1,element);  /*Add to the top of our visitation queue*/
           el->v=alter;
           el->next=tovisit;
           el->prev=NULL;
@@ -457,7 +457,7 @@ CHANGESTAT_FN(d_components) {
         if((!DYADMATCH(tail,head,v,alter))&&(!visited[alter-1])&&(!flag)){
           if(alter==head)  /*If we've found our goal, set the flag*/
             flag=1;
-          el=Calloc(1,element);  /*Add to the top of our visitation queue*/
+          el=R_Calloc(1,element);  /*Add to the top of our visitation queue*/
           el->v=alter;
           el->next=tovisit;
           el->prev=NULL;
@@ -481,13 +481,13 @@ CHANGESTAT_FN(d_components) {
     }
     /*Clean up*/
     //Rprintf("Cleaning up\n");
-    Free(visited);
+    R_Free(visited);
     el=tovisit;
     while(el!=NULL){
       //Rprintf("\tRemoving %ld\n",el->v);
       nextvis=el;
       el=el->next;
-      Free(nextvis);
+      R_Free(nextvis);
     }
     //Rprintf("\tDone cleaning\n");
     TOGGLE_IF_MORE_TO_COME(i);
@@ -546,14 +546,14 @@ CHANGESTAT_FN(d_compsizesum) {
     //Rprintf("Working on {%ld,%ld}\n",tail,head);
     /*First step: perform a BFS from tail, either finding head (in which case the CS
     is 0) or else calculating the size of tail's component.*/
-    el=Calloc(1,element);
+    el=R_Calloc(1,element);
     el->v=tail;
     el->next=NULL;
     el->prev=NULL;
     tovisit=el;
     nextvis=el;
     flag=(DIRECTED)&&(IS_OUTEDGE(head,tail)); /*Redundant w/in dyad edge shortcut*/
-    visited=Calloc(N_NODES,char);
+    visited=R_Calloc(N_NODES,char);
     visited[tail-1]=1;
     cst=1.0; /*Tail component size*/
     while((!flag)&&(tovisit!=NULL)){
@@ -566,13 +566,13 @@ CHANGESTAT_FN(d_compsizesum) {
         el->prev->next=NULL;
       v=el->v;
       //Rprintf("\tDeqeued %ld\n",v);
-      Free(el);             /*Recycle this element*/
+      R_Free(el);           /*Recycle this element*/
       /*Process v*/
       STEP_THROUGH_OUTEDGES(v,e,alter){
         if((!DYADMATCH(tail,head,v,alter))&&(!visited[alter-1])&&(!flag)){
           if(alter==head)  /*If we've found our goal, set the flag*/
             flag=1;
-          el=Calloc(1,element);  /*Add to the top of our visitation queue*/
+          el=R_Calloc(1,element);  /*Add to the top of our visitation queue*/
           el->v=alter;
           el->next=tovisit;
           el->prev=NULL;
@@ -590,7 +590,7 @@ CHANGESTAT_FN(d_compsizesum) {
         if((!DYADMATCH(tail,head,v,alter))&&(!visited[alter-1])&&(!flag)){
           if(alter==head)  /*If we've found our goal, set the flag*/
             flag=1;
-          el=Calloc(1,element);  /*Add to the top of our visitation queue*/
+          el=R_Calloc(1,element);  /*Add to the top of our visitation queue*/
           el->v=alter;
           el->next=tovisit;
           el->prev=NULL;
@@ -605,23 +605,23 @@ CHANGESTAT_FN(d_compsizesum) {
         }
       }
     }
-    Free(visited);  /*Clean up*/
+    R_Free(visited);  /*Clean up*/
     el=tovisit;
     while(el!=NULL){
       nextvis=el;
       el=el->next;
-      Free(nextvis);
+      R_Free(nextvis);
     }
     /*Second step: if we didn't find head, then this edge is a bridge, and we need to
     find the size of head's component (without the tail,head edge, that is).*/
     if(!flag){
-      el=Calloc(1,element);
+      el=R_Calloc(1,element);
       el->v=head;
       el->next=NULL;
       el->prev=NULL;
       tovisit=el;
       nextvis=el;
-      visited=Calloc(N_NODES,char);
+      visited=R_Calloc(N_NODES,char);
       visited[head-1]=1;
       csh=1.0; /*Head component size*/
       while(tovisit!=NULL){
@@ -633,11 +633,11 @@ CHANGESTAT_FN(d_compsizesum) {
         else
           el->prev->next=NULL;
         v=el->v;
-        Free(el);             /*Recycle this element*/
+        R_Free(el);           /*Recycle this element*/
         /*Process v*/
         STEP_THROUGH_OUTEDGES(v,e,alter){
           if((!DYADMATCH(tail,head,v,alter))&&(!visited[alter-1])){
-            el=Calloc(1,element);  /*Add to the top of our visitation queue*/
+            el=R_Calloc(1,element);  /*Add to the top of our visitation queue*/
             el->v=alter;
             el->next=tovisit;
             el->prev=NULL;
@@ -652,7 +652,7 @@ CHANGESTAT_FN(d_compsizesum) {
         }
         STEP_THROUGH_INEDGES(v,e,alter){
           if((!DYADMATCH(tail,head,v,alter))&&(!visited[alter-1])){
-            el=Calloc(1,element);  /*Add to the top of our visitation queue*/
+            el=R_Calloc(1,element);  /*Add to the top of our visitation queue*/
             el->v=alter;
             el->next=tovisit;
             el->prev=NULL;
@@ -666,12 +666,12 @@ CHANGESTAT_FN(d_compsizesum) {
           }
         }
       }
-      Free(visited);  /*Clean up*/
+      R_Free(visited);  /*Clean up*/
       el=tovisit;
       while(el!=NULL){
         nextvis=el;
         el=el->next;
-        Free(nextvis);
+        R_Free(nextvis);
       }
     }
     /*Perform changestat increment*/

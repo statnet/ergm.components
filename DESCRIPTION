@@ -1,6 +1,6 @@
 Package: ergm.components
-Version: 0.4
-Date: 2023-08-29
+Version: 0.5
+Date: 2025-09-01
 Title:  ERGM Terms Based on Connectivity and Components
 Authors@R: person("Carter T.", "Butts", role=c("aut","cre"), email="buttsc@uci.edu")
 LinkingTo: ergm
